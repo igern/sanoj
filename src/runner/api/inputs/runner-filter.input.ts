@@ -5,5 +5,5 @@ import { CreateRunnerInput } from './create-runner.input';
 @InputType()
 export class RunnerFilterInput extends IntersectionType(
   PartialType(CreateRunnerInput),
-  IdArgs,
+  PartialType(IdArgs),
 ) {}
