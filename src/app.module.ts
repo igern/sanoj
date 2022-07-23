@@ -26,6 +26,7 @@ import { RunnerApiModule } from './runner/api/runner.api.module';
         'graphql-ws': true,
       },
       playground: false,
+      introspection: true,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     RunnerApiModule,
