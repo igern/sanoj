@@ -47,39 +47,39 @@ export class RunnerService {
     pagination = pagination || {};
 
     pagination.limit = pagination.limit || 20;
+    pagination.sortAscending = pagination.sortAscending || false;
+
+    console.log(pagination);
 
     const cursorQuery = this.generateCursorQuery(pagination);
-    const sort = this.generateSort(pagination);
+    const $sort = this.generateSort(pagination);
 
+    console.log(JSON.stringify({ $and: [cursorQuery, filter] }, null, 2));
+    console.log(JSON.stringify($sort, null, 2));
     let results = await this.runnerModel
       .find({ $and: [cursorQuery, filter] })
-      .sort(sort as any)
+      .sort($sort as any)
       .limit(pagination.limit + 1);
+
+    console.log(results);
 
     const hasMore = results.length > pagination.limit;
     if (hasMore) results.pop();
 
-    const hasPrevious = !!pagination.next || !!(pagination.previous && hasMore);
-    const hasNext = !!pagination.previous || hasMore;
+    const hasNext = hasMore;
 
-    if (pagination.previous) results = results.reverse();
     return {
       results,
-      previous: results[0],
-      hasPrevious,
       next: results[results.length - 1],
       hasNext,
     };
   }
 
   generateCursorQuery(pagination: ICursorPagination) {
-    if (!pagination.next && !pagination.previous) return {};
+    if (!pagination.next) return {};
 
-    const sortAsc =
-      (!pagination.sortAscending && pagination.previous) ||
-      (pagination.sortAscending && !pagination.previous);
-    const comparisonOp = sortAsc ? '$gt' : '$lt';
-    const op = pagination.next || pagination.previous;
+    const comparisonOp = pagination.sortAscending ? '$gt' : '$lt';
+    const op = pagination.next;
     return {
       _id: {
         [comparisonOp]: op,
@@ -88,10 +88,7 @@ export class RunnerService {
   }
 
   generateSort(pagination: ICursorPagination) {
-    const sortAsc =
-      (!pagination.sortAscending && pagination.previous) ||
-      (pagination.sortAscending && !pagination.previous);
-    const sortDir = sortAsc ? 1 : -1;
+    const sortDir = pagination.sortAscending ? 1 : -1;
 
     return {
       _id: sortDir,

@@ -34,8 +34,6 @@ export class RunnerResolver {
     const result = await this.runnerService.findPaginated(pagination, filter);
     return {
       results: result.results.map((e) => RunnerModel.from(e)),
-      previous: RunnerModel.from(result.previous),
-      hasPrevious: result.hasPrevious,
       next: RunnerModel.from(result.next),
       hasNext: result.hasNext,
     };

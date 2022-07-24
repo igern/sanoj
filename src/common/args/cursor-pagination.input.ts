@@ -4,7 +4,6 @@ export interface ICursorPagination {
   limit?: number;
   sortAscending?: boolean;
   next?: string;
-  previous?: string;
 }
 
 @InputType()
@@ -17,7 +16,4 @@ export class CursorPaginationInput implements ICursorPagination {
 
   @Field({ nullable: true })
   next?: string;
-
-  @Field({ nullable: true })
-  previous?: string;
 }
