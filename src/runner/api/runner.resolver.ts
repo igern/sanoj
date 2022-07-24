@@ -26,6 +26,12 @@ const PaginatedRunnerModel = Paginated(RunnerModel);
 export class RunnerResolver {
   constructor(private readonly runnerService: RunnerService) {}
 
+  @Query(() => RunnerModel)
+  async oneRunner(@Args() { id }: IdArgs): Promise<RunnerModel> {
+    const result = await this.runnerService.findById(id);
+    return RunnerModel.from(result);
+  }
+
   @Query(() => PaginatedRunnerModel)
   async runners(
     @Args('pagination') pagination: CursorPaginationInput,

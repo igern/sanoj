@@ -40,6 +40,12 @@ export class RunnerService {
     return await this.runnerModel.find(filter);
   }
 
+  async findById(id: string): Promise<Runner> {
+    const runner = await this.runnerModel.findById(id);
+    if (!runner) throw new Error('runner not found');
+    return runner;
+  }
+
   async findPaginated(
     pagination: ICursorPagination,
     filter: Partial<Runner>,
