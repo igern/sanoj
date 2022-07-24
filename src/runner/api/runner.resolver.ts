@@ -1,7 +1,9 @@
 import { Type } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
+import { CursorPaginationArgs } from 'src/common/args/cursor-pagination.args';
 import { IdArgs } from 'src/common/args/id.args';
+import { IPaginatedType, Paginated } from 'src/common/models/paginated';
 import {
   ISubscriptionPayload,
   MutationType,
@@ -16,22 +18,30 @@ import { RunnerModel } from './runner.model';
 
 const pubSub = new PubSub();
 
-const RunnerSubscriptionPayloadModel =
+const SubscriptionPayloadRunnerModel =
   SubscriptionPayload<RunnerModel>(RunnerModel);
+const PaginatedRunnerModel = Paginated(RunnerModel);
 
 @Resolver(() => RunnerModel)
 export class RunnerResolver {
   constructor(private readonly runnerService: RunnerService) {}
 
-  @Query(() => [RunnerModel])
+  @Query(() => PaginatedRunnerModel)
   async runners(
+    @Args() pagination: CursorPaginationArgs,
     @Args('input') input: RunnerFilterInput,
-  ): Promise<RunnerModel[]> {
-    const runners = await this.runnerService.find(input);
-    return runners.map((e) => RunnerModel.from(e));
+  ): Promise<IPaginatedType<RunnerModel>> {
+    const result = await this.runnerService.findPaginated(pagination, input);
+    return {
+      results: result.results.map((e) => RunnerModel.from(e)),
+      previous: RunnerModel.from(result.previous),
+      hasPrevious: result.hasPrevious,
+      next: RunnerModel.from(result.next),
+      hasNext: result.hasNext,
+    };
   }
 
-  @Subscription(() => RunnerSubscriptionPayloadModel, {
+  @Subscription(() => SubscriptionPayloadRunnerModel, {
     filter(
       payload: { runner: ISubscriptionPayload<RunnerModel> },
       variables: { input: RunnerFilterInput },

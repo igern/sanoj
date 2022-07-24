@@ -19,7 +19,7 @@ export interface ISubscriptionPayload<T> {
 export function SubscriptionPayload<T>(
   classRef: Type<T>,
 ): Type<ISubscriptionPayload<T>> {
-  @ObjectType(`SubscriptionPayload${classRef.name}`)
+  @ObjectType({ isAbstract: true })
   abstract class SubscriptionPayloadType implements ISubscriptionPayload<T> {
     @Field(() => MutationType)
     mutation: MutationType;
