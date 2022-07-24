@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ICursorPagination } from 'src/common/args/cursor-pagination.args';
+import { ICursorPagination } from 'src/common/args/cursor-pagination.input';
 import { IPaginatedType } from 'src/common/models/paginated';
 import { Runner, RunnerDocument } from './runner.schema';
 

@@ -1,7 +1,7 @@
 import { Type } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
-import { CursorPaginationArgs } from 'src/common/args/cursor-pagination.args';
+import { CursorPaginationInput } from 'src/common/args/cursor-pagination.input';
 import { IdArgs } from 'src/common/args/id.args';
 import { IPaginatedType, Paginated } from 'src/common/models/paginated';
 import {
@@ -28,10 +28,10 @@ export class RunnerResolver {
 
   @Query(() => PaginatedRunnerModel)
   async runners(
-    @Args() pagination: CursorPaginationArgs,
-    @Args('input') input: RunnerFilterInput,
+    @Args('pagination') pagination: CursorPaginationInput,
+    @Args('input') filter: RunnerFilterInput,
   ): Promise<IPaginatedType<RunnerModel>> {
-    const result = await this.runnerService.findPaginated(pagination, input);
+    const result = await this.runnerService.findPaginated(pagination, filter);
     return {
       results: result.results.map((e) => RunnerModel.from(e)),
       previous: RunnerModel.from(result.previous),

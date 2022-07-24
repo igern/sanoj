@@ -1,4 +1,4 @@
-import { ArgsType, Int, Field, ID } from '@nestjs/graphql';
+import { ArgsType, Int, Field, ID, InputType } from '@nestjs/graphql';
 
 export interface ICursorPagination {
   limit?: number;
@@ -7,8 +7,8 @@ export interface ICursorPagination {
   previous?: string;
 }
 
-@ArgsType()
-export class CursorPaginationArgs implements ICursorPagination {
+@InputType()
+export class CursorPaginationInput implements ICursorPagination {
   @Field(() => Int, { nullable: true })
   limit?: number;
 
