@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ICursorPagination } from 'src/common/args/cursor-pagination.input';
+import { cursorFind, ICursorPagination } from 'src/common/cursor-find';
 import { IPaginatedType } from 'src/common/models/paginated';
 import { Runner, RunnerDocument } from './runner.schema';
 
@@ -50,54 +50,6 @@ export class RunnerService {
     pagination: ICursorPagination,
     filter: Partial<Runner>,
   ): Promise<IPaginatedType<Runner>> {
-    pagination = pagination || {};
-
-    pagination.limit = pagination.limit || 20;
-    pagination.sortAscending = pagination.sortAscending || false;
-
-    console.log(pagination);
-
-    const cursorQuery = this.generateCursorQuery(pagination);
-    const $sort = this.generateSort(pagination);
-
-    console.log(JSON.stringify({ $and: [cursorQuery, filter] }, null, 2));
-    console.log(JSON.stringify($sort, null, 2));
-    let results = await this.runnerModel
-      .find({ $and: [cursorQuery, filter] })
-      .sort($sort as any)
-      .limit(pagination.limit + 1);
-
-    console.log(results);
-
-    const hasMore = results.length > pagination.limit;
-    if (hasMore) results.pop();
-
-    const hasNext = hasMore;
-
-    return {
-      results,
-      next: results[results.length - 1],
-      hasNext,
-    };
-  }
-
-  generateCursorQuery(pagination: ICursorPagination) {
-    if (!pagination.next) return {};
-
-    const comparisonOp = pagination.sortAscending ? '$gt' : '$lt';
-    const op = pagination.next;
-    return {
-      _id: {
-        [comparisonOp]: op,
-      },
-    };
-  }
-
-  generateSort(pagination: ICursorPagination) {
-    const sortDir = pagination.sortAscending ? 1 : -1;
-
-    return {
-      _id: sortDir,
-    };
+    return await cursorFind(this.runnerModel, pagination, filter);
   }
 }
